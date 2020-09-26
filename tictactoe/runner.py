@@ -21,8 +21,6 @@ user = None
 board = ttt.initial_state()
 ai_turn = False
 
-ttt.terminal(board)
-
 while True:
 
     for event in pygame.event.get():
@@ -129,7 +127,7 @@ while True:
                         board = ttt.result(board, (i, j))
 
         if game_over:
-            againButton = pygame.Rect(width / 3, height - 65, width / 3, 50)
+            againButton = pygame.Rect(width // 3, height - 65, width // 3, 50)
             again = mediumFont.render("Play Again", True, black)
             againRect = again.get_rect()
             againRect.center = againButton.center
