@@ -4,14 +4,12 @@ import sys
 
 # estrutura do nó do grafo para busca de soluções (nesse caso, sem o PathCost, pois pode-se calculá-lo no final da busca)
 class Node ():
-
 	def __init__(self, state, parent, action):
 		self.state = state
 		self.parent = parent
 		self.action = action
 
 class StackFrontier (): # usada para DFS
-
 	def __init__(self):
 		self.frontier = [] # lista para guardar os estados a serem analizados na fronteira
 
@@ -33,7 +31,6 @@ class StackFrontier (): # usada para DFS
 			return node
 
 class QueueFrontier (StackFrontier): # usada para BFS, herda metodos de StackFrontier
-
 	def remove (self):
 		if self.empty():
 			raise Exception("Fronteira está vazia")
@@ -43,7 +40,6 @@ class QueueFrontier (StackFrontier): # usada para BFS, herda metodos de StackFro
 			return node
 
 class Maze ():
-
 	def __init__(self, filename):
 		with open(filename) as r:
 			contents = r.read()
@@ -153,10 +149,10 @@ class Maze ():
 					frontier.add(child)
 
 
-maze = Maze("maze3.txt")
+maze = Maze("src0/maze1.txt")
 maze.printMaze()
 print("Tentando encontrar caminho...")
-maze.solveProblem(1) # 0 para BFS e 1 para DFS
+maze.solveProblem(0) # 0 para BFS e 1 para DFS
 print("Estados visitados:", maze.nrVisited)
 print("Solução")
 maze.printMaze()
