@@ -20,7 +20,7 @@ def initial_state():
 
 
 def count_empty(board):
-    return len([e for listL in board for e in listL if e is None])
+    return len([e for listL in board for e in listL if e is EMPTY])
     
 
 # Returns player who has the next turn on a board. 
@@ -42,100 +42,112 @@ def actions(board):
     possibles = []
     for i in range (0, 3):
         for j in range(0, 3):
-            if board[i][j] == None:
+            if board[i][j] == EMPTY:
                 possibles.append((i,j))
     return possibles
 
 # Returns the board that results from making move (i, j) on the board.
 def result(board, action):
     aux = copy.deepcopy(board)
-    if action[0] >= 0 and action[0] <=2 and action[1] >= 0 and action[1] <= 2:
-        aux[action[0]][action[1]] = get_letter(board)
+    i, j = action
+    if i >= 0 and i <=2 and j >= 0 and j <= 2 and aux[i][j] is EMPTY:
+        aux[i][j] = get_letter(board)
         return aux
     else:
         raise Exception("Index out of range")
 
 # Returns the winner of the game, if there is one.
 def winner(board):
-    r = utility(board)
-    if r == 1:
-        return X
-    elif r == -1:
-        return O
-    else:
-        return None
-
-
-# Returns True if game is over, False otherwise.
-def terminal(board):
-    return False if winner(board) == None and count_empty(board) != 0 else True
-
-
-# Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
-def utility(board):
     turn = [X, O]
     for t in turn:
         diag2 = []
         aux = 2 # aux for secondary diagonal
-        result = 1 if t == X else -1
         for i in range (0, 3): # check elements per line
             if all(e == t for e in board[i]):
-                return result
+                return t
             col = []
             diag = []
             for j in range (0, 3):
                 col.append(board[j][i])
             if all(e == t for e in col): # check elements per column
-                return result
+                return t
             diag2.append(board[i][aux])
             aux = aux - 1
         for i in range(0, 3):
             diag.append(board[i][i])
         if all(e == t for e in diag): # check main diagonal
-                return result
-        if all(e == t for e in diag2): # check secondary diagonal5
-            return result
-    return 0
+                return t
+        if all(e == t for e in diag2): # check secondary diagonal
+            return t
+    return None
 
-def maxvalue(board, v):
+
+# Returns True if game is over, False otherwise.
+def terminal(board):
+    if count_empty(board) == 0 or winner(board) != None:
+        return True
+    return False
+
+
+# Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
+def utility(board):
+    r = winner(board)
+    if r == X:
+        return 1
+    elif r == O:
+        return -1
+    else:
+        return 0
+
+def maxvalue(board):
     #aux = copy.deepcopy(board)
     if terminal(board):
-        return [utility(board), (v[1])]
+        return utility(board)
+    v = -1
     for a in actions(board):
-        v[1] = a
-        r = minvalue(result(board, a), v)
-        v[0] = max(v[0], r[0])
+        r = minvalue(result(board, a))
+        v = max(v, r)
+        if v == 1:
+            break
     return v
 
-def minvalue(board, v):
+def minvalue(board):
     #aux = copy.deepcopy(board)
     if terminal(board):
-        return [utility(board), (v[1])]
+        return utility(board)
+    v = 1
     for a in actions(board):
-        v[1] = a
-        r = maxvalue(result(board, a), v)
-        v[0] = min(v[0], r[0])
+        r = maxvalue(result(board, a))
+        v = min(v, r)
+        if v == -1:
+            break
     return v
 
 # Returns the optimal action for the current player on the board.
 def minimax(board):
-    print("\n*************************************************** ENTROU MINMAX *************************************\n")
     if terminal(board):
         return None
     if get_letter(board) == X:
-        v = [-math.inf, (0,0)]
-        r = maxvalue(board, v)
-        print("X maximizou para ", r)
-        return r[1] # X aims to maximize score
+        best = -1
+        move = (-1, -1)
+        if count_empty(board) == 0:
+            return move
+        for action in actions(board):
+            move_value = minvalue(result(board, action))
+            if move_value == 1:
+                move = action
+                break
+            if move_value > best: #alpha beta pruning
+                move = action
+        return move # X aims to maximize score
     else:
-        v = [math.inf, (0,0)]
-        r = minvalue(board, v)
-        print("O minimizou para ", r)
-        return r[1] # O aims to minimize
-
-"""
-        if r[0] >= 2: # 2 is beta value
-            return v
-        if r[0] > v[0]:
-            v[0] = r[0]
-"""
+        best = 1
+        move = (-1, -1)
+        for action in actions(board):
+            move_value = maxvalue(result(board, action))
+            if move_value == -1:
+                move = action
+                break
+            if move_value < best: #alpha beta pruning
+                move = action
+        return move # O aims to minimize score
