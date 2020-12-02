@@ -2,8 +2,8 @@
 Tictactoe game made in python using pygame.
 
 ## How to run
-- install requirements
-pip install requirements
+- install requirements:
+**pip install requirements**
 
-- in the tictactoe folder type
-python runner.py 
+- in the tictactoe folder type:
+**python runner.py**
